@@ -37,7 +37,7 @@ Settings
 	The GitHub repository name.
 * **map_id** (required)
 	The ID of the HTML element in which to draw the map.
-* **cache_location** (optional)
+* **cache_location**
 	The path (relative or absolute) of a JSON file containing precomputed geolocation data. If omitted, Red Dwarf will compute all data from scratch (see [Performance](#performance)). *Note: this file's contents are equivalent to the output of the [toJSON](#methods) method.*
 * **map_zoom** The initial zoom level of the heatmap. *Default: 2.* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
 * **map_lat** The initial latitude position on which the heatmap is centered. *Default: 20.* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
@@ -46,7 +46,7 @@ Settings
 
 Methods
 -------
-* **toJSON** Returns a JSON representation of a mapping of string locations to geocodes, the number of repository stars, and a mapping of stargazers' user logins to their resppective user objects.
+* **toJSON** Returns a JSON representation of a mapping of string locations to geocodes, the number of repository stars, and a mapping of stargazers' user logins to their respective user objects.
 
 Events
 ------
