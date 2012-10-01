@@ -55,18 +55,18 @@ Red Dwarf will trigger each of the following events during processing. Arguments
 Event handlers are defined by including functions keyed by the respective event name in the settings object.
 
 * **onRepositoryLoaded** Fired after successfully loading repository info from the GitHub API.
-	* **data** The data object returned by GitHub.
+	* `data` The data object returned by GitHub.
 * **onCacheLoaded** Fired after successfully loading the JSON cache file.
 * **onStargazersUpdated** Fired after processing a chunk of at most 100 repository stargazers.
-	* **num_stargazers** The number of stargazers processed so far.
+	* `num_stargazers` The number of stargazers processed so far.
 * **onStargazersLoaded** Fired after successfully loading all stargazers.
 * **onLocationUpdated** Fired after successfully loading a single stargazer's profile.
-	* **num_resolved_stargazers** The number of stargazers whose profiles have been loaded so far.
-	* **num_stargazers** The total number of profiles to load.
+	* `num_resolved_stargazers` The number of stargazers whose profiles have been loaded so far.
+	* `num_stargazers` The total number of profiles to load.
 * **onLocationLoaded** Fired after successfully loading all stargazers' profiles.
 * **onPointsUpdated** Fired after geocoding a chunk of at most 10 stargazer locations.
-	* **num_resolved_points** The number of locations geocoded so far.
-	* **num_stargazers** The total number of locations to geocode.
+	* `num_resolved_points` The number of locations geocoded so far.
+	* `num_stargazers` The total number of locations to geocode.
 * **onPointsLoaded** Fired after successfully geocoding all locations and drawing the heatmap.
 	
 Performance
