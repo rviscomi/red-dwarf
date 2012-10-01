@@ -1,5 +1,5 @@
 /**!
- * red dwarf v1.0
+ * red dwarf v1.0.1
  * https://github.com/rviscomi/red-dwarf
  * 
  * Copyright 2012 Rick Viscomi
@@ -126,11 +126,11 @@
 		$.ajax({
 			url: 'https://api.github.com/repos/' + this.user + '/' +
 					this.repository,
-			dataType: 'json',
+			dataType: 'jsonp',
 			success: function (data) {
-				that.num_stargazers = data.watchers; // TODO data.stargazers?
+				that.num_stargazers = data.data.watchers; // TODO data.stargazers?
 				
-				that.onRepositoryLoaded(data);
+				that.onRepositoryLoaded(data.data);
 			},
 			complete: onComplete
 		});
