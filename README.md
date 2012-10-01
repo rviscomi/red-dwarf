@@ -19,7 +19,7 @@ Red Dwarf depends on Google Maps for geocoding and mapping. You must get a [Goog
 
 Usage
 -----
-Instantiate a new RedDwarf object, the constructor of which accepts a configuration object (see [Settings](#Settings)).
+Instantiate a new RedDwarf object, the constructor of which accepts a configuration object (see [Settings](#settings)).
 
 ```js
 var stars = new RedDwarf({
@@ -38,7 +38,7 @@ Settings
 * **map_id** (required)
 	The ID of the HTML element in which to draw the map.
 * **cache_location** (optional)
-	The path (relative or absolute) of a JSON file containing precomputed geolocation data. If omitted, Red Dwarf will compute all data from scratch (see [Performance](#Performance)). *Note: this file's contents are equivalent to the output of the [toJSON](#Methods) method.*
+	The path (relative or absolute) of a JSON file containing precomputed geolocation data. If omitted, Red Dwarf will compute all data from scratch (see [Performance](#performance)). *Note: this file's contents are equivalent to the output of the [toJSON](#methods) method.*
 * **map_zoom** The initial zoom level of the heatmap. *Default: 2.* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
 * **map_lat** The initial latitude position on which the heatmap is centered. *Default: 20.* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
 * **map_lng** The initial longitude position on which the heatmap is centered. *Default: 0.* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
