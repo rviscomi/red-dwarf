@@ -1,11 +1,11 @@
 /**!
- * red dwarf v1.0.1
+ * red dwarf v1.0.2
  * https://github.com/rviscomi/red-dwarf
  * 
  * Copyright 2012 Rick Viscomi
  * Released under the MIT License.
  * 
- * Date: September 30, 2012
+ * Date: October 1, 2012
  */
 
 (function () {
@@ -34,6 +34,7 @@
 		this.map_id = options.map_id;
 		this.cache_location = options.cache_location || '';
 		this.num_stargazers = 0;
+		this.num_cached_stargazers = 0;
 		this.stargazers = {};
 		this.points = [];
 		this.geocodes = {};
@@ -115,6 +116,10 @@
 				}
 				
 				that.onCacheLoaded();
+			},
+			error: function () {
+				/* Show no errors. */
+				return false;
 			},
 			complete: onComplete
 		});
@@ -239,7 +244,8 @@
 	RedDwarf.prototype.getGeoCoordinates = function (locations) {
 		var that = this,
 			geo = new google.maps.Geocoder(),
-			OK = google.maps.GeocoderStatus.OK;
+			OK = google.maps.GeocoderStatus.OK,
+			n = locations.length;
 		
 		/* Delay to avoid maxing out Google API. */
 		timedChunk(locations, function (location) {
@@ -248,10 +254,20 @@
 					that.points.push(results[0].geometry.location);
 					that.geocodes[location] = results[0].geometry.location;
 				}
+				
+				/* After all locations have been converted. */
+				if (!--n) {
+					that.drawHeatmap();
+				}
 			});
 			
 			that.onPointsUpdated(that.points.length, that.num_stargazers);
-		}, this, this.drawHeatmap, 15e3, 10);
+		}, this, function () {}, 15e3, 10);
+		
+		/* Passing an empty callback function to timedChunk because the */
+		/* process function in turn makes an async request. So the callback */
+		/* may be invoked before the async request of the final process. */
+		/* Do nothing on callback, let the process function handle next step. */
 	};
 	
 	RedDwarf.prototype.drawMap = function (zoom, lat, lng, type) {
