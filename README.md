@@ -13,10 +13,6 @@ How it Works
 ------------
 Red Dwarf uses the GitHub API to determine the locations of people who have starred a given repository. Then, using the Google Maps API, these locations are translated into geocoordinates and fed into a heatmap. The result is a beautiful and detailed visualization of global positions of a repository's stargazers.
 
-Privacy
--------
-Red Dwarf uses publicly-available stargazer information including login names and locations via the GitHub API. Locations are only derived from stargazers who have opted in to making their location public in their GitHub profile.
-
 Getting Started
 ---------------
 Red Dwarf depends on Google Maps for geocoding and mapping. You must get a [Google Maps API key](https://developers.google.com/maps/documentation/javascript/tutorial#api_key) to access these services.
@@ -50,9 +46,9 @@ Settings
 * **cache_location**
 	The path (relative or absolute) of a JSON file containing precomputed geolocation data. If omitted, Red Dwarf will compute all data from scratch (see [Performance](#performance)). *Note: this file's contents are equivalent to the output of the [toJSON](#methods) method.*
 * **map_zoom** The initial zoom level of the heatmap. *Default: 2.* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
-* **map_lat** The initial latitude position on which the heatmap is centered. *Default: 20.* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
-* **map_lng** The initial longitude position on which the heatmap is centered. *Default: 0.* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
-* **map_type** The initial type of the heatmap: road, satellite, hybrid, or terrain. *Default: road.* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
+* **map_lat** The initial latitude position on which the heatmap is centered. *Default: `20`. (20 degrees north of the equator)* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
+* **map_lng** The initial longitude position on which the heatmap is centered. *Default: `0`. (Prime Meridian)* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
+* **map_type** The initial type of the heatmap: road, satellite, hybrid, or terrain. *Default: `"roadmap"`.* ([more info](https://developers.google.com/maps/documentation/javascript/tutorial#MapOptions))
 
 Methods
 -------
@@ -88,6 +84,10 @@ Also note that repositories with many thousands of stargazers will likely hit us
 For these reasons, it's best to pre-cache as frequently as possible. This will prevent each page load from incurring the usage limit penalizations.
 
 Red Dwarf will only make API calls for data not already in the cache.
+
+Privacy
+-------
+Red Dwarf uses publicly-available stargazer information including login names and locations via the GitHub API. Locations are only derived from stargazers who have opted in to making their location public in their GitHub profile.
 
 MIT License
 -----------
