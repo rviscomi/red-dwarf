@@ -19,7 +19,7 @@ Red Dwarf depends on Google Maps for geocoding and mapping. You must get a [Goog
 
 Usage
 -----
-Import the Google Maps JavaScript API. Appending `libraries=visualization` to the source path will ensure that you have the heatmap library available. Replace `YOUR_KEY` with the API key provided to you by Google.
+Import the Google Maps JavaScript API. Appending `libraries=visualization` to the source path will ensure that you have the heatmap library available. Replace `YOUR_KEY` with the API key [provided to you by Google](https://developers.google.com/maps/documentation/javascript/tutorial#api_key).
 
 ```html
 <script src="http://maps.googleapis.com/maps/api/js?key=YOUR_KEY&sensor=false&libraries=visualization"></script>
