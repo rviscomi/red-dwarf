@@ -11,7 +11,11 @@ Play with the [live demo](http://jrvis.com/trunk8/stars.html?rel=github).
 
 How it Works
 ------------
-Red Dwarf uses the GitHub API to determine the locations of people who have starred a given repository. Then, using the Google Maps API, these locations are translated into geocoordinates and fed into a heatmap visualization. The result is a beautiful and detailed visualization of global positions of a repository's stargazers.
+Red Dwarf uses the GitHub API to determine the locations of people who have starred a given repository. Then, using the Google Maps API, these locations are translated into geocoordinates and fed into a heatmap. The result is a beautiful and detailed visualization of global positions of a repository's stargazers.
+
+Privacy
+-------
+Red Dwarf uses publicly-available stargazer information including login names and locations via the GitHub API. Locations are only derived from stargazers who have opted in to making their location public in their GitHub profile.
 
 Getting Started
 ---------------
@@ -77,7 +81,7 @@ Event handlers are defined by including functions keyed by the respective event 
 	
 Performance
 -----------
-It's important to pre-cache the geolocation data because the Google Maps geocoding API places strict limits on the frequency of requests. Trial and error indicates that this limit is in the neighborhood of 40 requests per minute. This means repository with 200 stars would take 5 minutes to get all geocoordinates. By default, Red Dwarf rate limits requests using a technique based on work by [Nicholas Zakas](http://www.nczonline.net/blog/2009/08/11/timed-array-processing-in-javascript/).
+It's important to pre-cache the geolocation data because the Google Maps geocoding API places strict limits on the frequency of requests. Trial and error indicates that this limit is in the neighborhood of 40 requests per minute. This means a repository with 200 stars would take 5 minutes to get all geocoordinates. By default, Red Dwarf rate limits requests using a technique based on work by [Nicholas Zakas](http://www.nczonline.net/blog/2009/08/11/timed-array-processing-in-javascript/).
 
 Also note that repositories with many thousands of stargazers will likely hit usage limits on GitHub's API, because each stargazer's profile must be queried in order to get their location. Rate limiting is currently in development for this scenario.
 
