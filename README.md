@@ -71,11 +71,11 @@ Event handlers are defined by including functions keyed by the respective event 
 	
 Performance
 -----------
-It's important to pre-cache the geolocation data because the Google Maps geocoding API places strict limits on the frequency of requests. Trial and error indicates that this limit is in the neighborhood of 40 requests per minute. This means repository with 200 stars would take 5 minutes to get all geocoordinates. By default, Red Dwarf rate limits requests to this API using a technique based on work by [Nicholas Zakas](http://www.nczonline.net/blog/2009/08/11/timed-array-processing-in-javascript/).
+It's important to pre-cache the geolocation data because the Google Maps geocoding API places strict limits on the frequency of requests. Trial and error indicates that this limit is in the neighborhood of 40 requests per minute. This means repository with 200 stars would take 5 minutes to get all geocoordinates. By default, Red Dwarf rate limits requests using a technique based on work by [Nicholas Zakas](http://www.nczonline.net/blog/2009/08/11/timed-array-processing-in-javascript/).
 
-Also note that repositories with many thousands of stargazers will likely hit usuage limits on GitHub's API, because each stargazer's profile must be queried in order to get their location. Rate limiting is currently in development for this scenario.
+Also note that repositories with many thousands of stargazers will likely hit usage limits on GitHub's API, because each stargazer's profile must be queried in order to get their location. Rate limiting is currently in development for this scenario.
 
-For these reasons, it's best to pre-cache as frequently as possible. This will prevent each visitor to your page from incurring the usage limit penalizations.
+For these reasons, it's best to pre-cache as frequently as possible. This will prevent each page load from incurring the usage limit penalizations.
 
 Red Dwarf will only make API calls for data not already in the cache.
 
