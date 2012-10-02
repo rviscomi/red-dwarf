@@ -7,7 +7,7 @@ About
 -----
 **Red Dwarf** is a heatmap visualization of GitHub repository stargazers.
 
-Play with the [live demo](http://jrvis.com/trunk8/stars.html?rel=github).
+Play with the [live demo](http://jrvis.com/red-dwarf/?rel=github).
 
 How it Works
 ------------
