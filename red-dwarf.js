@@ -1,11 +1,11 @@
 /**!
- * red dwarf v1.0.2
+ * red dwarf v1.0.3
  * https://github.com/rviscomi/red-dwarf
  * 
  * Copyright 2012 Rick Viscomi
  * Released under the MIT License.
  * 
- * Date: October 1, 2012
+ * Date: October 3, 2012
  */
 
 (function () {
@@ -37,6 +37,7 @@
 		this.num_cached_stargazers = 0;
 		this.stargazers = {};
 		this.points = [];
+		this.locations = [];
 		this.geocodes = {};
 		
 		/* Require Google Maps API. */
@@ -177,9 +178,15 @@
 							
 							/* If this stargazer is not in cache, do lookup. */
 							if (!that.stargazers[stargazer.login]) {
-								that.stargazers[stargazer.login] = stargazer;
+								that.stargazers[stargazer.login] = {
+									login: stargazer.login,
+									url: stargazer.url
+								};
 								
-								stargazers.push(stargazer);
+								stargazers.push({
+									login: stargazer.login,
+									url: stargazer.url
+								});
 							}
 						}
 						
@@ -207,7 +214,6 @@
 		var that = this,
 			n = stargazers.length,
 			num_resolved_stargazers = 0,
-			locations = [],
 			i, stargazer;
 		
 		for (i = 0; i < n; i++) {
@@ -219,32 +225,43 @@
 				success: function (data, textStatus, xhr) {
 					var location = '';
 					
-					num_resolved_stargazers++;
-					
 					if (textStatus === 'success' && data.meta.status === 200) {
 						location = data.data.location;
 					}
 					
-					if (location && !that.points[location]) {
-						locations.push(location);
+					if (location && !that.geocodes[location]) {
+						that.locations.push(location);
 					}
+				},
+				error: function () {
+					console.warn('Error loading', stargazer.login);
+				},
+				complete: function () {
+					num_resolved_stargazers++;
 					
 					that.onLocationUpdated(num_resolved_stargazers, n);
 					
 					if (num_resolved_stargazers === n) {
 						that.onLocationLoaded();
 						
-						that.getGeoCoordinates(locations);
+						that.getGeoCoordinates();
 					}
 				}
 			});
 		}
+		
+		if (!n) {
+			that.onLocationLoaded();
+			
+			that.getGeoCoordinates();
+		}
 	};
 	
-	RedDwarf.prototype.getGeoCoordinates = function (locations) {
+	RedDwarf.prototype.getGeoCoordinates = function () {
 		var that = this,
 			geo = new google.maps.Geocoder(),
 			OK = google.maps.GeocoderStatus.OK,
+			locations = this.locations,
 			n = locations.length;
 		
 		/* Delay to avoid maxing out Google API. */
@@ -255,19 +272,23 @@
 					that.geocodes[location] = results[0].geometry.location;
 				}
 				
+				that.onPointsUpdated(that.points.length, that.num_stargazers);
+				
 				/* After all locations have been converted. */
 				if (!--n) {
 					that.drawHeatmap();
 				}
 			});
-			
-			that.onPointsUpdated(that.points.length, that.num_stargazers);
 		}, this, function () {}, 15e3, 10);
 		
 		/* Passing an empty callback function to timedChunk because the */
 		/* process function in turn makes an async request. So the callback */
 		/* may be invoked before the async request of the final process. */
 		/* Do nothing on callback, let the process function handle next step. */
+		
+		if (!locations.length) {
+			that.drawHeatmap();
+		}
 	};
 	
 	RedDwarf.prototype.drawMap = function (zoom, lat, lng, type) {
