@@ -1,11 +1,11 @@
 /**!
- * red dwarf v1.0.3
+ * red dwarf v1.0.4
  * https://github.com/rviscomi/red-dwarf
  * 
  * Copyright 2012 Rick Viscomi
  * Released under the MIT License.
  * 
- * Date: October 3, 2012
+ * Date: October 5, 2012
  */
 
 (function () {
@@ -153,8 +153,8 @@
 	
 	RedDwarf.prototype.appendStargazers = function () {
 		var that = this,
-			page = 1,
-			num_stargazers = 0,
+			page = Math.ceil(this.num_cached_stargazers / 100) || 1,
+			num_stargazers = this.num_cached_stargazers,
 			stargazers = [];
 		
 		function loadStargazers() {
@@ -187,10 +187,11 @@
 									login: stargazer.login,
 									url: stargazer.url
 								});
+								
+								num_stargazers++;
 							}
 						}
 						
-						num_stargazers += n;
 						that.onStargazersUpdated(num_stargazers);
 					}
 					
@@ -213,12 +214,10 @@
 	RedDwarf.prototype.getStargazersLocation = function (stargazers) {
 		var that = this,
 			n = stargazers.length,
-			num_resolved_stargazers = 0,
-			i, stargazer;
+			num_resolved_stargazers = 0;
 		
-		for (i = 0; i < n; i++) {
-			stargazer = stargazers[i];
-			
+		timedChunk(stargazers, function (stargazer) {
+			/* Query the GitHub API for stargazer profile. */
 			$.ajax({
 				url: stargazer.url,
 				dataType: 'jsonp',
@@ -248,7 +247,7 @@
 					}
 				}
 			});
-		}
+		}, null, function () {}, 7e2, 1); // load one every 700 ms
 		
 		if (!n) {
 			that.onLocationLoaded();
