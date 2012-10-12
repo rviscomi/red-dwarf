@@ -1,11 +1,11 @@
 /**!
- * red dwarf v1.0.4
+ * red dwarf v1.0.5
  * https://github.com/rviscomi/red-dwarf
  * 
  * Copyright 2012 Rick Viscomi
  * Released under the MIT License.
  * 
- * Date: October 5, 2012
+ * Date: October 12, 2012
  */
 
 (function () {
@@ -49,6 +49,7 @@
 		}
 		
 		/* Event hooks. */
+		this.onRepositoryError = options.onRepositoryError || function () {};
 		this.onRepositoryLoaded = options.onRepositoryLoaded || function () {};
 		this.onCacheLoaded = options.onCacheLoaded || function () {};
 		this.onStargazersUpdated = options.onStargazersUpdated || function () {};
@@ -134,9 +135,14 @@
 					this.repository,
 			dataType: 'jsonp',
 			success: function (data) {
-				that.num_stargazers = data.data.watchers; // TODO data.stargazers?
-				
-				that.onRepositoryLoaded(data.data);
+				if (data.meta.status === 200) {
+					that.num_stargazers = data.data.watchers; // TODO data.stargazers?
+					
+					that.onRepositoryLoaded(data.data);
+				}
+				else {
+					that.onRepositoryError(data.data.message);
+				}
 			},
 			complete: onComplete
 		});

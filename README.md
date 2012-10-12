@@ -62,6 +62,8 @@ Event handlers are defined by including functions keyed by the respective event 
 
 * **onRepositoryLoaded** Fired after successfully loading repository info from the GitHub API.
 	* `data` The data object returned by GitHub.
+* **onRepositoryError** Fired after unsuccessfully loading repository info from the GitHub API.
+	* `message` The error message returned by GitHub.
 * **onCacheLoaded** Fired after successfully loading the JSON cache file.
 * **onStargazersUpdated** Fired after processing a chunk of at most 100 repository stargazers.
 	* `num_stargazers` The number of stargazers processed so far.
