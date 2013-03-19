@@ -1,11 +1,11 @@
 /**!
- * red dwarf v2.0
+ * red dwarf v2.1
  * https://github.com/rviscomi/red-dwarf
  * 
- * Copyright 2012 Rick Viscomi
+ * Copyright 2013 Rick Viscomi
  * Released under the MIT License.
  * 
- * Date: October 18, 2012
+ * Date: March 18, 2013
  */
 
 (function () {
@@ -407,6 +407,14 @@
 			}
 		}, 25);
 	}
+	
+	/* Inject a custom toJSON method on google.maps.LatLng object. */
+	google.maps.LatLng.prototype.toJSON = function () {
+		return {
+			latitude: this.lat(),
+			longitude: this.lng()
+		};
+	};
 	
 	/* Expose as a global object. */
 	window.RedDwarf = RedDwarf;
