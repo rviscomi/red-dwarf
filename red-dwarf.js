@@ -1,17 +1,21 @@
 /**!
- * red dwarf v1.0.5
+ * red dwarf v2.0
  * https://github.com/rviscomi/red-dwarf
  * 
  * Copyright 2012 Rick Viscomi
  * Released under the MIT License.
  * 
- * Date: October 12, 2012
+ * Date: October 18, 2012
  */
 
 (function () {
 	'use strict';
 	
+	var STATUS_OK = '200 OK';
+	
 	function RedDwarf(options) {
+		var noop;
+		
 		/* Validate options. */
 		if (!options.user ||
 				!options.repository ||
@@ -33,6 +37,7 @@
 		this.repository = options.repository;
 		this.map_id = options.map_id;
 		this.cache_location = options.cache_location || '';
+		this.api_location = options.api_location || 'https://api.github.com/';
 		this.num_stargazers = 0;
 		this.num_cached_stargazers = 0;
 		this.stargazers = {};
@@ -49,15 +54,16 @@
 		}
 		
 		/* Event hooks. */
-		this.onRepositoryError = options.onRepositoryError || function () {};
-		this.onRepositoryLoaded = options.onRepositoryLoaded || function () {};
-		this.onCacheLoaded = options.onCacheLoaded || function () {};
-		this.onStargazersUpdated = options.onStargazersUpdated || function () {};
-		this.onStargazersLoaded = options.onStargazersLoaded || function () {};
-		this.onLocationUpdated = options.onLocationUpdated || function () {};
-		this.onLocationLoaded = options.onLocationLoaded || function () {};
-		this.onPointsUpdated = options.onPointsUpdated || function () {};
-		this.onPointsLoaded = options.onPointsLoaded || function () {};
+		noop = function () {};
+		this.onRepositoryError = options.onRepositoryError || noop;
+		this.onRepositoryLoaded = options.onRepositoryLoaded || noop;
+		this.onCacheLoaded = options.onCacheLoaded || noop;
+		this.onStargazersUpdated = options.onStargazersUpdated || noop;
+		this.onStargazersLoaded = options.onStargazersLoaded || noop;
+		this.onLocationUpdated = options.onLocationUpdated || noop;
+		this.onLocationLoaded = options.onLocationLoaded || noop;
+		this.onPointsUpdated = options.onPointsUpdated || noop;
+		this.onPointsLoaded = options.onPointsLoaded || noop;
 		
 		this.start();
 	}
@@ -111,8 +117,23 @@
 					for (location in data.geocodes) {
 						if (data.geocodes.hasOwnProperty(location)) {
 							geocode = data.geocodes[location];
-							that.geocodes[location] = geocode;
-							that.points.push(new google.maps.LatLng(geocode.Xa, geocode.Ya));
+							
+							if (geocode.latitude && geocode.longitude) {
+								that.geocodes[location] = geocode;
+								that.points.push(new google.maps.LatLng(geocode.latitude, geocode.longitude));
+							}
+							else if (geocode.Xa) {
+								that.geocodes[location] = {latitude: geocode.Xa, longitude: geocode.Ya};
+								that.points.push(new google.maps.LatLng(geocode.Xa, geocode.Ya));
+							}
+							else if (geocode.Za) { // ughh i hate this code FIXME
+								that.geocodes[location] = {latitude: geocode.Ya, longitude: geocode.Za};
+								that.points.push(new google.maps.LatLng(geocode.Ya, geocode.Za));
+							}
+							else if (geocode.$a) { // FIXME
+								that.geocodes[location] = {latitude: geocode.$a, longitude: geocode.ab};
+								that.points.push(new google.maps.LatLng(geocode.$a, geocode.ab));
+							}
 						}
 					}
 				}
@@ -131,11 +152,11 @@
 		var that = this;
 		
 		$.ajax({
-			url: 'https://api.github.com/repos/' + this.user + '/' +
+			url: this.api_location + 'repos/' + this.user + '/' +
 					this.repository,
-			dataType: 'jsonp',
+			dataType: 'json',
 			success: function (data) {
-				if (data.meta.status === 200) {
+				if (data.status === STATUS_OK) {
 					that.num_stargazers = data.data.watchers; // TODO data.stargazers?
 					
 					that.onRepositoryLoaded(data.data);
@@ -150,9 +171,14 @@
 	
 	RedDwarf.prototype.onInitialized = function () {
 		if (this.num_stargazers <= this.num_cached_stargazers) {
-			this.drawHeatmap();
+			this.drawHeatmap(this.onPointsLoaded);
 		}
 		else {
+			if (this.points.length > 0) {
+				/* Draw what we have so far */
+				this.drawHeatmap();
+			}
+			
 			this.appendStargazers();
 		}
 	};
@@ -165,17 +191,17 @@
 		
 		function loadStargazers() {
 			$.ajax({
-				url: 'https://api.github.com/repos/' + that.user + '/' +
-						that.repository + '/stargazers',
+				url: that.api_location + 'users/' + that.user + '/' +
+						that.repository,
 				data: {
 					page: page,
 					per_page: 100
 				},
-				dataType: 'jsonp', 
+				dataType: 'json', 
 				success: function (data, textStatus, xhr) {
-					var i, n, stargazer;
+					var n = 0, i, stargazer;
 					
-					if (textStatus === 'success' && data.meta.status === 200) {
+					if (textStatus === 'success' && data.status === STATUS_OK) {
 						n = data.data.length;
 						
 						/* Add new stargazers to instance property. */
@@ -189,10 +215,7 @@
 									url: stargazer.url
 								};
 								
-								stargazers.push({
-									login: stargazer.login,
-									url: stargazer.url
-								});
+								stargazers.push(stargazer.login);
 								
 								num_stargazers++;
 							}
@@ -201,9 +224,11 @@
 						that.onStargazersUpdated(num_stargazers);
 					}
 					
-					if (num_stargazers < that.num_stargazers) {
+					if (num_stargazers < that.num_stargazers && n) {
 						page++;
-						loadStargazers();
+						
+						/* Wait 400 ms. */
+						setTimeout(loadStargazers, 2e2);
 					}
 					else {
 						that.onStargazersLoaded();
@@ -225,21 +250,27 @@
 		timedChunk(stargazers, function (stargazer) {
 			/* Query the GitHub API for stargazer profile. */
 			$.ajax({
-				url: stargazer.url,
-				dataType: 'jsonp',
+				url: that.api_location + 'users/' + stargazer,
+				dataType: 'json',
 				success: function (data, textStatus, xhr) {
-					var location = '';
+					var location = '',
+						geocode;
 					
-					if (textStatus === 'success' && data.meta.status === 200) {
+					if (textStatus === 'success' && data.status === STATUS_OK) {
 						location = data.data.location;
 					}
 					
 					if (location && !that.geocodes[location]) {
 						that.locations.push(location);
 					}
+					else if (location) {
+						/* If it's in cache, add this instance. */
+						geocode = that.geocodes[location];
+						that.points.push(new google.maps.LatLng(geocode.latitude, geocode.longitude));
+					}
 				},
 				error: function () {
-					console.warn('Error loading', stargazer.login);
+					console.warn('Error loading', stargazer);
 				},
 				complete: function () {
 					num_resolved_stargazers++;
@@ -253,7 +284,7 @@
 					}
 				}
 			});
-		}, null, function () {}, 7e2, 1); // load one every 700 ms
+		}, null, function () {}, 4e2, 1); // load 2.5 per second
 		
 		if (!n) {
 			that.onLocationLoaded();
@@ -281,10 +312,13 @@
 				
 				/* After all locations have been converted. */
 				if (!--n) {
+					that.drawHeatmap(that.onPointsLoaded);
+				}
+				else {
 					that.drawHeatmap();
 				}
 			});
-		}, this, function () {}, 15e3, 10);
+		}, this, function () {}, 15e2, 1);
 		
 		/* Passing an empty callback function to timedChunk because the */
 		/* process function in turn makes an async request. So the callback */
@@ -292,31 +326,38 @@
 		/* Do nothing on callback, let the process function handle next step. */
 		
 		if (!locations.length) {
-			that.drawHeatmap();
+			that.drawHeatmap(this.onPointsLoaded);
 		}
 	};
 	
-	RedDwarf.prototype.drawMap = function (zoom, lat, lng, type) {
+	RedDwarf.prototype.drawMap = function (zoom, lat, lng, type, styles) {
 		zoom = zoom || 2;
 		lat = lat || 20;
 		lng = lng || 0;
 		type = type || google.maps.MapTypeId.ROADMAP;
+		styles = styles || [];
 		
-		this.map = new google.maps.Map(document.getElementById(this.map_id), {
+		this.map = this.map || new google.maps.Map(document.getElementById(this.map_id));
+		
+		this.map.setOptions({
 			zoom: zoom,
 			center: new google.maps.LatLng(lat, lng),
-			mapTypeId: type
+			mapTypeId: type,
+			styles: styles
 		});
-	};
-	
-	RedDwarf.prototype.drawHeatmap = function () {
-		new google.maps.visualization.HeatmapLayer({
-			data: this.points,
+		
+		this.map_layer = this.map_layer || new google.maps.visualization.HeatmapLayer({
 			map: this.map,
 			radius: 25
 		});
+	};
+	
+	RedDwarf.prototype.drawHeatmap = function (callback) {
+		this.map_layer.setData(this.points);
 		
-		this.onPointsLoaded();
+		if (callback) {
+			callback();
+		}
 	};
 	
 	RedDwarf.prototype.hasMapsAPI = function () {
