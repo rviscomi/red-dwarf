@@ -120,19 +120,19 @@
 							
 							if (geocode.latitude && geocode.longitude) {
 								that.geocodes[location] = geocode;
-								that.points.push(new google.maps.LatLng(geocode.latitude, geocode.longitude));
+								that.points.push(new google.maps.LatLng({lat:geocode.latitude, lng:geocode.longitude}));
 							}
 							else if (geocode.Xa) {
 								that.geocodes[location] = {latitude: geocode.Xa, longitude: geocode.Ya};
-								that.points.push(new google.maps.LatLng(geocode.Xa, geocode.Ya));
+								that.points.push(new google.maps.LatLng({lat: geocode.Xa, lng: geocode.Ya}));
 							}
 							else if (geocode.Za) { // ughh i hate this code FIXME
 								that.geocodes[location] = {latitude: geocode.Ya, longitude: geocode.Za};
-								that.points.push(new google.maps.LatLng(geocode.Ya, geocode.Za));
+								that.points.push(new google.maps.LatLng({lat: geocode.Ya, lng: geocode.Za}));
 							}
 							else if (geocode.$a) { // FIXME
 								that.geocodes[location] = {latitude: geocode.$a, longitude: geocode.ab};
-								that.points.push(new google.maps.LatLng(geocode.$a, geocode.ab));
+								that.points.push(new google.maps.LatLng({lat: geocode.$a, lng: geocode.ab}));
 							}
 						}
 					}
@@ -266,7 +266,7 @@
 					else if (location) {
 						/* If it's in cache, add this instance. */
 						geocode = that.geocodes[location];
-						that.points.push(new google.maps.LatLng(geocode.latitude, geocode.longitude));
+						that.points.push(new google.maps.LatLng({lat:geocode.latitude, lng:geocode.longitude}));
 					}
 				},
 				error: function () {
@@ -341,7 +341,7 @@
 		
 		this.map.setOptions({
 			zoom: zoom,
-			center: new google.maps.LatLng(lat, lng),
+			center: new google.maps.LatLng({lat:lat, lng:lng}),
 			mapTypeId: type,
 			styles: styles
 		});
@@ -411,8 +411,8 @@
 	/* Inject a custom toJSON method on google.maps.LatLng object. */
 	google.maps.LatLng.prototype.toJSON = function () {
 		return {
-			latitude: this.lat(),
-			longitude: this.lng()
+			lat: this.lat(),
+			lng: this.lng()
 		};
 	};
 	
