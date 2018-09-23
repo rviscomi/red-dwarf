@@ -1,4 +1,4 @@
-Red Dwarf
+Red Dwarf (LOOKING FOR A NEW MAINTAINER)
 =========
 
 ![trunk8 heatmap](http://jrvis.com/red-dwarf/img/trunk8-heatmap.jpg)
